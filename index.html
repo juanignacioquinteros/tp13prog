@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Juegos - Catálogo Digital</title>
+    
+    <!-- Integración de Bootstrap 5.3.3 vía CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Iconos de Bootstrap para mejorar la estética estilo Steam -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Estilos personalizados mínimos para complementar el modo oscuro estilo Steam */
+        body {
+            background-color: #00000027;
+        }
+        .navbar-steam {
+            background-color: #bb2525;
+            border-bottom: 1px solid #000000;
+        }
+        .card-steam {
+            background-color: #000000;
+            border: 1px solid #bb2525;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .card-steam:hover {
+            transform: translateY(-4px);
+            border-color: #03630b;
+        }
+        .filter-panel {
+            background-color: #000000;
+            border: 1px solid #bb2525;
+            border-radius: 8px;
+        }
+        .table-steam {
+            --bs-table-bg: #18162d;
+            --bs-table-hover-bg: #1e2d3f;
+            border-color: #2a475e;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 1: BARRA DE NAVEGACIÓN (NAVBAR)                               -->
+    <!-- ===================================================================== -->
+    <nav class="navbar navbar-expand-lg navbar-steam sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-controller fs-3" style="color: #000000;"></i>
+                <div>
+                    <span style="color: #000000; background-color: #03630b; padding: 2px 6px; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">ZOMBI</span><span style="color: #03630b; background-color: #000000; padding: 2px 6px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">TYPE</span>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#seccion-filtros"><i class="bi bi-search me-1"></i>Buscador</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#seccion-destacados"><i class="bi bi-star-fill text-warning me-1"></i>Destacados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#seccion-catalogo"><i class="bi bi-list-ul me-1"></i>Catálogo Completo (100)</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Fin de la barra de navegación -->
+
+    <!-- ===================================================================== -->
+    <!-- CONTENEDOR PRINCIPAL DE LA APLICACIÓN                                 -->
+    <!-- ===================================================================== -->
+    <div class="container py-4">
+
+        <!-- ================================================================= -->
+        <!-- SECCIÓN 2: ENCABEZADO PRINCIPAL (HERO)                            -->
+        <!-- ================================================================= -->
+        <header class="text-center py-4 mb-4">
+            <h1 class="display-5 fw-bold text-primary mb-2">Tu Biblioteca Digital de Videojuegos</h1>
+            <p class="lead text-secondary mb-0">Explora, filtra por requisitos de hardware y administra tu colección de PC multiplataforma.</p>
+        </header>
+        <!-- Fin del encabezado principal -->
+
+        <!-- ================================================================= -->
+        <!-- SECCIÓN 3: BUSCADOR Y PANEL DE FILTROS                            -->
+        <!-- ================================================================= -->
+        <section id="seccion-filtros" class="filter-panel p-4 mb-5 shadow">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 fw-bold text-warning mb-0">
+                    <i class="bi bi-funnel-fill me-2"></i>Buscador y Filtros Avanzados
+                </h2>
+                <button id="btn-limpiar" class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar filtros
+                </button>
+            </div>
+
+            <!-- Fila de controles de filtrado utilizando el Grid de Bootstrap -->
+            <div class="row g-3">
+                <!-- Filtro 1: Búsqueda por nombre -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="filtro-nombre" class="form-label small text-secondary fw-semibold">Nombre del juego</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary"><i class="bi bi-search text-primary"></i></span>
+                        <input type="text" id="filtro-nombre" class="form-control bg-dark border-secondary text-white" placeholder="Ej: Witcher, Counter, GTA...">
+                    </div>
+                </div>
+
+                <!-- Filtro 2: Temática / Género -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="filtro-genero" class="form-label small text-secondary fw-semibold">Temática / Género</label>
+                    <select id="filtro-genero" class="form-select bg-dark border-secondary text-white">
+                        <option value="Todos">Todas las temáticas</option>
+                        <option value="Acción / Aventura">Acción / Aventura</option>
+                        <option value="RPG">RPG / Rol</option>
+                        <option value="Shooter">Shooter / Disparos</option>
+                        <option value="Estrategia">Estrategia</option>
+                        <option value="Indie / Plataformas">Indie / Plataformas</option>
+                        <option value="Supervivencia / Terror">Supervivencia / Terror</option>
+                        <option value="Deportes / Carreras">Deportes / Carreras</option>
+                        <option value="Simulación / Sandbox">Simulación / Sandbox</option>
+                    </select>
+                </div>
+
+                <!-- Filtro 3: Requisitos de PC -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="filtro-gama" class="form-label small text-secondary fw-semibold">Requisitos de Hardware</label>
+                    <select id="filtro-gama" class="form-select bg-dark border-secondary text-white">
+                        <option value="Todas">Cualquier PC (Todas las gamas)</option>
+                        <option value="Gama Baja">PC Gama Baja (Livianos)</option>
+                        <option value="Gama Media">PC Gama Media (Equilibrados)</option>
+                        <option value="Gama Alta">PC Gama Alta (Exigentes)</option>
+                    </select>
+                </div>
+
+                <!-- Filtro 4: Rango de Precio en ARS -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="filtro-precio" class="form-label small text-secondary fw-semibold">Rango de Precio (ARS)</label>
+                    <select id="filtro-precio" class="form-select bg-dark border-secondary text-white">
+                        <option value="Todos">Todos los precios</option>
+                        <option value="Gratis">Gratis (Free to Play)</option>
+                        <option value="Economico">Hasta $15.000 ARS</option>
+                        <option value="Intermedio">Entre $15.001 y $45.000 ARS</option>
+                        <option value="Premium">Más de $45.000 ARS</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Fin de la fila de controles -->
+        </section>
+        <!-- Fin de la sección de buscador y filtros -->
+
+        <!-- ================================================================= -->
+        <!-- SECCIÓN 4: JUEGOS DESTACADOS (TARJETAS / CARDS)                   -->
+        <!-- ================================================================= -->
+        <section id="seccion-destacados" class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 fw-bold text-white mb-0">
+                    <i class="bi bi-fire text-warning me-2"></i>Destacados de la Semana
+                </h2>
+                <span class="badge bg-primary">Selección Multiplataforma</span>
+            </div>
+
+            <!-- Grid responsivo de 4 tarjetas destacadas -->
+            <div class="row g-4">
+                <!-- Tarjeta Destacada 1 -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card card-steam h-100 p-3">
+                        <div class="card-body d-flex flex-column p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-info text-dark">RPG</span>
+                                <span class="badge bg-danger">Gama Alta</span>
+                            </div>
+                            <h3 class="h5 card-title fw-bold text-white">Elden Ring</h3>
+                            <p class="card-text small text-secondary flex-grow-1">Un vasto mundo de fantasía oscura creado por Hidetaka Miyazaki y George R. R. Martin.</p>
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+                                <span class="small text-muted">2022</span>
+                                <span class="fw-bold text-warning">$58.999 ARS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin tarjeta 1 -->
+
+                <!-- Tarjeta Destacada 2 -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card card-steam h-100 p-3">
+                        <div class="card-body d-flex flex-column p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-success">Indie / Plataformas</span>
+                                <span class="badge bg-secondary">Gama Baja</span>
+                            </div>
+                            <h3 class="h5 card-title fw-bold text-white">Hollow Knight</h3>
+                            <p class="card-text small text-secondary flex-grow-1">Forja tu propio camino en Hallownest, un reino en ruinas repleto de insectos y héroes.</p>
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+                                <span class="small text-muted">2017</span>
+                                <span class="fw-bold text-warning">$14.500 ARS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin tarjeta 2 -->
+
+                <!-- Tarjeta Destacada 3 -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card card-steam h-100 p-3">
+                        <div class="card-body d-flex flex-column p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">Shooter</span>
+                                <span class="badge bg-warning text-dark">Gama Media</span>
+                            </div>
+                            <h3 class="h5 card-title fw-bold text-white">Counter-Strike 2</h3>
+                            <p class="card-text small text-secondary flex-grow-1">El shooter táctico competitivo por excelencia renovado con el motor Source 2.</p>
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+                                <span class="small text-muted">2023</span>
+                                <span class="fw-bold text-success">Gratis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin tarjeta 3 -->
+
+                <!-- Tarjeta Destacada 4 -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card card-steam h-100 p-3">
+                        <div class="card-body d-flex flex-column p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-info text-dark">RPG</span>
+                                <span class="badge bg-warning text-dark">Gama Media</span>
+                            </div>
+                            <h3 class="h5 card-title fw-bold text-white">The Witcher 3: Wild Hunt</h3>
+                            <p class="card-text small text-secondary flex-grow-1">Encarna a Geralt de Rivia en una aventura épica de mundo abierto llena de decisiones.</p>
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+                                <span class="small text-muted">2015</span>
+                                <span class="fw-bold text-warning">$38.900 ARS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin tarjeta 4 -->
+            </div>
+            <!-- Fin del grid de tarjetas destacadas -->
+        </section>
+        <!-- Fin de la sección de destacados -->
+
+        <!-- ================================================================= -->
+        <!-- SECCIÓN 5: CATÁLOGO COMPLETO DE 100 JUEGOS (TABLA DE DATOS)       -->
+        <!-- ================================================================= -->
+        <section id="seccion-catalogo" class="p-4 filter-panel shadow">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+                <h2 class="h4 fw-bold text-primary mb-0">
+                    <i class="bi bi-collection-play-fill me-2"></i>Catálogo General de Videojuegos
+                </h2>
+                <!-- Contador dinámico de resultados -->
+                <span id="contador-resultados" class="badge bg-secondary fs-6 py-2 px-3">
+                    Mostrando 100 de 100 juegos
+                </span>
+            </div>
+
+            <!-- Contenedor responsivo para evitar desbordamiento horizontal en celulares -->
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-striped align-middle table-steam mb-0">
+                    <thead class="table-active">
+                        <tr>
+                            <th scope="col" class="text-center text-primary">ID</th>
+                            <th scope="col">Nombre del Juego</th>
+                            <th scope="col">Temática / Género</th>
+                            <th scope="col" class="text-center">Año</th>
+                            <th scope="col" class="text-center">Requisitos PC</th>
+                            <th scope="col" class="text-end text-warning">Precio (ARS)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-juegos-body">
+                        <!-- Las 100 filas se renderizan dinámicamente desde el script inferior -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Fin del div table-responsive -->
+
+            <!-- Mensaje de alerta cuando ningún juego coincide con los filtros -->
+            <div id="mensaje-sin-resultados" class="alert alert-warning text-center mt-3 d-none" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                No se encontraron videojuegos que coincidan con los filtros seleccionados. Probá ajustando tu búsqueda.
+            </div>
+        </section>
+        <!-- Fin de la sección del catálogo completo -->
+
+    </div>
+    <!-- Fin del contenedor principal (.container) -->
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 6: PIE DE PÁGINA (FOOTER)                                     -->
+    <!-- ===================================================================== -->
+    <footer class="text-center py-4 mt-5 border-top border-secondary text-secondary">
+        <div class="container">
+            <p class="mb-1 fw-semibold text-white">Trabajo Práctico 13 - Gestor de Juegos Responsivo con Bootstrap</p>
+            <p class="small mb-0">Laboratorio de Programación - 6° G | Catálogo Multiplataforma en Pesos Argentinos</p>
+        </div>
+    </footer>
+    <!-- Fin del pie de página -->
+
+    <!-- ===================================================================== -->
+    <!-- SCRIPTS: BOOTSTRAP JS + LÓGICA DEL CATÁLOGO DE 100 JUEGOS Y FILTROS   -->
+    <!-- ===================================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        // Base de datos de 100 videojuegos multiplataforma reales (sin exclusivos de consola)
+        const catalogoJuegos = [
+            { id: 1, nombre: "Counter-Strike 2", genero: "Shooter", anio: 2023, gama: "Gama Media", precio: 0 },
+            { id: 2, nombre: "The Witcher 3: Wild Hunt", genero: "RPG", anio: 2015, gama: "Gama Media", precio: 38900 },
+            { id: 3, nombre: "Elden Ring", genero: "RPG", anio: 2022, gama: "Gama Alta", precio: 58999 },
+            { id: 4, nombre: "Grand Theft Auto V", genero: "Acción / Aventura", anio: 2015, gama: "Gama Media", precio: 34500 },
+            { id: 5, nombre: "Red Dead Redemption 2", genero: "Acción / Aventura", anio: 2019, gama: "Gama Alta", precio: 59900 },
+            { id: 6, nombre: "Hollow Knight", genero: "Indie / Plataformas", anio: 2017, gama: "Gama Baja", precio: 14500 },
+            { id: 7, nombre: "Stardew Valley", genero: "Simulación / Sandbox", anio: 2016, gama: "Gama Baja", precio: 13900 },
+            { id: 8, nombre: "Terraria", genero: "Simulación / Sandbox", anio: 2011, gama: "Gama Baja", precio: 9800 },
+            { id: 9, nombre: "Minecraft (Java & Bedrock)", genero: "Simulación / Sandbox", anio: 2011, gama: "Gama Baja", precio: 29500 },
+            { id: 10, nombre: "Cyberpunk 2077", genero: "RPG", anio: 2020, gama: "Gama Alta", precio: 56000 },
+            { id: 11, nombre: "Baldur's Gate 3", genero: "RPG", anio: 2023, gama: "Gama Alta", precio: 59500 },
+            { id: 12, nombre: "Portal 2", genero: "Indie / Plataformas", anio: 2011, gama: "Gama Baja", precio: 9500 },
+            { id: 13, nombre: "Half-Life 2", genero: "Shooter", anio: 2004, gama: "Gama Baja", precio: 8900 },
+            { id: 14, nombre: "Left 4 Dead 2", genero: "Shooter", anio: 2009, gama: "Gama Baja", precio: 9200 },
+            { id: 15, nombre: "Dota 2", genero: "Estrategia", anio: 2013, gama: "Gama Baja", precio: 0 },
+            { id: 16, nombre: "League of Legends", genero: "Estrategia", anio: 2009, gama: "Gama Baja", precio: 0 },
+            { id: 17, nombre: "Valorant", genero: "Shooter", anio: 2020, gama: "Gama Baja", precio: 0 },
+            { id: 18, nombre: "Apex Legends", genero: "Shooter", anio: 2019, gama: "Gama Media", precio: 0 },
+            { id: 19, nombre: "Rocket League", genero: "Deportes / Carreras", anio: 2015, gama: "Gama Baja", precio: 0 },
+            { id: 20, nombre: "EA Sports FC 25", genero: "Deportes / Carreras", anio: 2024, gama: "Gama Media", precio: 69900 },
+            { id: 21, nombre: "Hades", genero: "Indie / Plataformas", anio: 2020, gama: "Gama Baja", precio: 21500 },
+            { id: 22, nombre: "Celeste", genero: "Indie / Plataformas", anio: 2018, gama: "Gama Baja", precio: 17800 },
+            { id: 23, nombre: "Cuphead", genero: "Indie / Plataformas", anio: 2017, gama: "Gama Baja", precio: 18500 },
+            { id: 24, nombre: "Undertale", genero: "RPG", anio: 2015, gama: "Gama Baja", precio: 9500 },
+            { id: 25, nombre: "The Elder Scrolls V: Skyrim", genero: "RPG", anio: 2011, gama: "Gama Baja", precio: 36000 },
+            { id: 26, nombre: "Fallout: New Vegas", genero: "RPG", anio: 2010, gama: "Gama Baja", precio: 11500 },
+            { id: 27, nombre: "Fallout 4", genero: "RPG", anio: 2015, gama: "Gama Media", precio: 24900 },
+            { id: 28, nombre: "DOOM Eternal", genero: "Shooter", anio: 2020, gama: "Gama Media", precio: 39900 },
+            { id: 29, nombre: "DOOM (2016)", genero: "Shooter", anio: 2016, gama: "Gama Media", precio: 19500 },
+            { id: 30, nombre: "Resident Evil 4 Remake", genero: "Supervivencia / Terror", anio: 2023, gama: "Gama Alta", precio: 54900 },
+            { id: 31, nombre: "Resident Evil 2 Remake", genero: "Supervivencia / Terror", anio: 2019, gama: "Gama Media", precio: 34900 },
+            { id: 32, nombre: "Resident Evil 7: Biohazard", genero: "Supervivencia / Terror", anio: 2017, gama: "Gama Media", precio: 22900 },
+            { id: 33, nombre: "Outlast", genero: "Supervivencia / Terror", anio: 2013, gama: "Gama Baja", precio: 14800 },
+            { id: 34, nombre: "Phasmophobia", genero: "Supervivencia / Terror", anio: 2020, gama: "Gama Media", precio: 18900 },
+            { id: 35, nombre: "Dead by Daylight", genero: "Supervivencia / Terror", anio: 2016, gama: "Gama Media", precio: 19900 },
+            { id: 36, nombre: "Subnautica", genero: "Supervivencia / Terror", anio: 2018, gama: "Gama Media", precio: 26500 },
+            { id: 37, nombre: "The Forest", genero: "Supervivencia / Terror", anio: 2018, gama: "Gama Media", precio: 17500 },
+            { id: 38, nombre: "Sons of the Forest", genero: "Supervivencia / Terror", anio: 2024, gama: "Gama Alta", precio: 29800 },
+            { id: 39, nombre: "Rust", genero: "Supervivencia / Terror", anio: 2018, gama: "Gama Media", precio: 37900 },
+            { id: 40, nombre: "ARK: Survival Evolved", genero: "Supervivencia / Terror", anio: 2017, gama: "Gama Media", precio: 16900 },
+            { id: 41, nombre: "Valheim", genero: "Supervivencia / Terror", anio: 2021, gama: "Gama Media", precio: 19500 },
+            { id: 42, nombre: "Age of Empires II: Definitive Edition", genero: "Estrategia", anio: 2019, gama: "Gama Baja", precio: 21000 },
+            { id: 43, nombre: "Age of Empires IV", genero: "Estrategia", anio: 2021, gama: "Gama Media", precio: 39500 },
+            { id: 44, nombre: "Sid Meier's Civilization VI", genero: "Estrategia", anio: 2016, gama: "Gama Baja", precio: 42000 },
+            { id: 45, nombre: "Cities: Skylines", genero: "Simulación / Sandbox", anio: 2015, gama: "Gama Media", precio: 27900 },
+            { id: 46, nombre: "Euro Truck Simulator 2", genero: "Simulación / Sandbox", anio: 2012, gama: "Gama Baja", precio: 18900 },
+            { id: 47, nombre: "Forza Horizon 5", genero: "Deportes / Carreras", anio: 2021, gama: "Gama Alta", precio: 54000 },
+            { id: 48, nombre: "Assetto Corsa", genero: "Deportes / Carreras", anio: 2014, gama: "Gama Baja", precio: 17900 },
+            { id: 49, nombre: "Need for Speed Heat", genero: "Deportes / Carreras", anio: 2019, gama: "Gama Media", precio: 46500 },
+            { id: 50, nombre: "Dark Souls III", genero: "RPG", anio: 2016, gama: "Gama Media", precio: 49900 },
+            { id: 51, nombre: "Sekiro: Shadows Die Twice", genero: "Acción / Aventura", anio: 2019, gama: "Gama Media", precio: 54500 },
+            { id: 52, nombre: "Devil May Cry 5", genero: "Acción / Aventura", anio: 2019, gama: "Gama Media", precio: 29900 },
+            { id: 53, nombre: "Monster Hunter: World", genero: "RPG", anio: 2018, gama: "Gama Media", precio: 29500 },
+            { id: 54, nombre: "Monster Hunter Rise", genero: "RPG", anio: 2022, gama: "Gama Media", precio: 36900 },
+            { id: 55, nombre: "NieR:Automata", genero: "RPG", anio: 2017, gama: "Gama Media", precio: 37500 },
+            { id: 56, nombre: "Persona 5 Royal", genero: "RPG", anio: 2022, gama: "Gama Media", precio: 53900 },
+            { id: 57, nombre: "Bioshock Infinite", genero: "Shooter", anio: 2013, gama: "Gama Baja", precio: 26900 },
+            { id: 58, nombre: "Borderlands 2", genero: "Shooter", anio: 2012, gama: "Gama Baja", precio: 18500 },
+            { id: 59, nombre: "Borderlands 3", genero: "Shooter", anio: 2019, gama: "Gama Media", precio: 47900 },
+            { id: 60, nombre: "Far Cry 3", genero: "Shooter", anio: 2012, gama: "Gama Baja", precio: 19000 },
+            { id: 61, nombre: "Far Cry 5", genero: "Shooter", anio: 2018, gama: "Gama Media", precio: 45900 },
+            { id: 62, nombre: "Assassin's Creed IV: Black Flag", genero: "Acción / Aventura", anio: 2013, gama: "Gama Baja", precio: 32500 },
+            { id: 63, nombre: "Assassin's Creed Valhalla", genero: "RPG", anio: 2020, gama: "Gama Alta", precio: 52900 },
+            { id: 64, nombre: "Batman: Arkham Knight", genero: "Acción / Aventura", anio: 2015, gama: "Gama Media", precio: 19800 },
+            { id: 65, nombre: "Batman: Arkham City", genero: "Acción / Aventura", anio: 2011, gama: "Gama Baja", precio: 16500 },
+            { id: 66, nombre: "Middle-earth: Shadow of Mordor", genero: "Acción / Aventura", anio: 2014, gama: "Gama Media", precio: 18900 },
+            { id: 67, nombre: "Control", genero: "Acción / Aventura", anio: 2019, gama: "Gama Alta", precio: 35900 },
+            { id: 68, nombre: "Alan Wake 2", genero: "Supervivencia / Terror", anio: 2023, gama: "Gama Alta", precio: 57500 },
+            { id: 69, nombre: "Metro Exodus", genero: "Shooter", anio: 2019, gama: "Gama Alta", precio: 28900 },
+            { id: 70, nombre: "Dying Light", genero: "Supervivencia / Terror", anio: 2015, gama: "Gama Media", precio: 21500 },
+            { id: 71, nombre: "Project Zomboid", genero: "Supervivencia / Terror", anio: 2013, gama: "Gama Baja", precio: 18900 },
+            { id: 72, nombre: "Don't Starve Together", genero: "Supervivencia / Terror", anio: 2016, gama: "Gama Baja", precio: 13500 },
+            { id: 73, nombre: "Among Us", genero: "Indie / Plataformas", anio: 2018, gama: "Gama Baja", precio: 4800 },
+            { id: 74, nombre: "Lethal Company", genero: "Supervivencia / Terror", anio: 2023, gama: "Gama Baja", precio: 9800 },
+            { id: 75, nombre: "Vampire Survivors", genero: "Indie / Plataformas", anio: 2022, gama: "Gama Baja", precio: 4900 },
+            { id: 76, nombre: "Dead Cells", genero: "Indie / Plataformas", anio: 2018, gama: "Gama Baja", precio: 21900 },
+            { id: 77, nombre: "Ori and the Will of the Wisps", genero: "Indie / Plataformas", anio: 2020, gama: "Gama Media", precio: 26900 },
+            { id: 78, nombre: "Blasphemous", genero: "Indie / Plataformas", anio: 2019, gama: "Gama Baja", precio: 21500 },
+            { id: 79, nombre: "Hotline Miami", genero: "Indie / Plataformas", anio: 2012, gama: "Gama Baja", precio: 9500 },
+            { id: 80, nombre: "Papers, Please", genero: "Indie / Plataformas", anio: 2013, gama: "Gama Baja", precio: 9200 },
+            { id: 81, nombre: "Outer Wilds", genero: "Acción / Aventura", anio: 2019, gama: "Gama Media", precio: 22900 },
+            { id: 82, nombre: "Subnautica: Below Zero", genero: "Supervivencia / Terror", anio: 2021, gama: "Gama Media", precio: 26500 },
+            { id: 83, nombre: "No Man's Sky", genero: "Simulación / Sandbox", anio: 2016, gama: "Gama Media", precio: 49900 },
+            { id: 84, nombre: "Sea of Thieves", genero: "Acción / Aventura", anio: 2018, gama: "Gama Media", precio: 36500 },
+            { id: 85, nombre: "Deep Rock Galactic", genero: "Shooter", anio: 2020, gama: "Gama Media", precio: 26900 },
+            { id: 86, nombre: "Payday 2", genero: "Shooter", anio: 2013, gama: "Gama Baja", precio: 9800 },
+            { id: 87, nombre: "Tom Clancy's Rainbow Six Siege", genero: "Shooter", anio: 2015, gama: "Gama Media", precio: 19900 },
+            { id: 88, nombre: "Warframe", genero: "Shooter", anio: 2013, gama: "Gama Media", precio: 0 },
+            { id: 89, nombre: "Destiny 2", genero: "Shooter", anio: 2017, gama: "Gama Media", precio: 0 },
+            { id: 90, nombre: "Genshin Impact", genero: "RPG", anio: 2020, gama: "Gama Media", precio: 0 },
+            { id: 91, nombre: "Fortnite", genero: "Shooter", anio: 2017, gama: "Gama Media", precio: 0 },
+            { id: 92, nombre: "Overwatch 2", genero: "Shooter", anio: 2022, gama: "Gama Media", precio: 0 },
+            { id: 93, nombre: "Path of Exile", genero: "RPG", anio: 2013, gama: "Gama Media", precio: 0 },
+            { id: 94, nombre: "Team Fortress 2", genero: "Shooter", anio: 2007, gama: "Gama Baja", precio: 0 },
+            { id: 95, nombre: "Garry's Mod", genero: "Simulación / Sandbox", anio: 2006, gama: "Gama Baja", precio: 9500 },
+            { id: 96, nombre: "Factorio", genero: "Estrategia", anio: 2020, gama: "Gama Baja", precio: 32000 },
+            { id: 97, nombre: "RimWorld", genero: "Estrategia", anio: 2018, gama: "Gama Baja", precio: 31500 },
+            { id: 98, nombre: "Slay the Spire", genero: "Estrategia", anio: 2019, gama: "Gama Baja", precio: 21500 },
+            { id: 99, nombre: "Starfield", genero: "RPG", anio: 2023, gama: "Gama Alta", precio: 62500 },
+            { id: 100, nombre: "Dragon's Dogma 2", genero: "RPG", anio: 2024, gama: "Gama Alta", precio: 64900 }
+        ];
+
+        // Referencias a los elementos del DOM
+        const tbody = document.getElementById("tabla-juegos-body");
+        const contadorResultados = document.getElementById("contador-resultados");
+        const mensajeSinResultados = document.getElementById("mensaje-sin-resultados");
+
+        const inputNombre = document.getElementById("filtro-nombre");
+        const selectGenero = document.getElementById("filtro-genero");
+        const selectGama = document.getElementById("filtro-gama");
+        const selectPrecio = document.getElementById("filtro-precio");
+        const btnLimpiar = document.getElementById("btn-limpiar");
+
+        // Función auxiliar para formatear el precio en Pesos Argentinos
+        function formatearPrecio(precio) {
+            if (precio === 0) {
+                return `<span class="badge bg-success fs-6">Gratis</span>`;
+            }
+            return `<span class="fw-bold text-warning">$${precio.toLocaleString("es-AR")} ARS</span>`;
+        }
+
+        // Función auxiliar para asignar colores de insignia según requisitos de PC
+        function formatearGama(gama) {
+            if (gama === "Gama Baja") {
+                return `<span class="badge bg-secondary">Gama Baja</span>`;
+            } else if (gama === "Gama Media") {
+                return `<span class="badge bg-warning text-dark">Gama Media</span>`;
+            } else {
+                return `<span class="badge bg-danger">Gama Alta</span>`;
+            }
+        }
+
+        // Función principal para dibujar las filas en la tabla HTML
+        function renderizarTabla(lista) {
+            tbody.innerHTML = "";
+
+            if (lista.length === 0) {
+                mensajeSinResultados.classList.remove("d-none");
+            } else {
+                mensajeSinResultados.classList.add("d-none");
+            }
+
+            lista.forEach(juego => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td class="text-center fw-bold text-primary">#${juego.id}</td>
+                    <td class="fw-semibold text-white">${juego.nombre}</td>
+                    <td><span class="badge bg-dark border border-secondary text-light">${juego.genero}</span></td>
+                    <td class="text-center text-secondary">${juego.anio}</td>
+                    <td class="text-center">${formatearGama(juego.gama)}</td>
+                    <td class="text-end">${formatearPrecio(juego.precio)}</td>
+                `;
+                tbody.appendChild(fila);
+            });
+
+            contadorResultados.textContent = `Mostrando ${lista.length} de ${catalogoJuegos.length} juegos`;
+        }
+
+        // Función que aplica los 4 filtros combinados en tiempo real
+        function aplicarFiltros() {
+            const textoBuscado = inputNombre.value.toLowerCase().trim();
+            const generoSeleccionado = selectGenero.value;
+            const gamaSeleccionada = selectGama.value;
+            const precioSeleccionado = selectPrecio.value;
+
+            const juegosFiltrados = catalogoJuegos.filter(juego => {
+                // 1. Coincidencia por nombre
+                const coincideNombre = juego.nombre.toLowerCase().includes(textoBuscado);
+
+                // 2. Coincidencia por temática / género
+                const coincideGenero = (generoSeleccionado === "Todos") || (juego.genero === generoSeleccionado);
+
+                // 3. Coincidencia por gama de requisitos
+                const coincideGama = (gamaSeleccionada === "Todas") || (juego.gama === gamaSeleccionada);
+
+                // 4. Coincidencia por rango de precio en ARS
+                let coincidePrecio = true;
+                if (precioSeleccionado === "Gratis") {
+                    coincidePrecio = juego.precio === 0;
+                } else if (precioSeleccionado === "Economico") {
+                    coincidePrecio = juego.precio > 0 && juego.precio <= 15000;
+                } else if (precioSeleccionado === "Intermedio") {
+                    coincidePrecio = juego.precio > 15000 && juego.precio <= 45000;
+                } else if (precioSeleccionado === "Premium") {
+                    coincidePrecio = juego.precio > 45000;
+                }
+
+                return coincideNombre && coincideGenero && coincideGama && coincidePrecio;
+            });
+
+            renderizarTabla(juegosFiltrados);
+        }
+
+        // Eventos para actualizar la tabla al escribir o cambiar opciones
+        inputNombre.addEventListener("input", aplicarFiltros);
+        selectGenero.addEventListener("change", aplicarFiltros);
+        selectGama.addEventListener("change", aplicarFiltros);
+        selectPrecio.addEventListener("change", aplicarFiltros);
+
+        // Evento para reiniciar todos los filtros
+        btnLimpiar.addEventListener("click", () => {
+            inputNombre.value = "";
+            selectGenero.value = "Todos";
+            selectGama.value = "Todas";
+            selectPrecio.value = "Todos";
+            renderizarTabla(catalogoJuegos);
+        });
+
+        // Carga inicial de los 100 videojuegos al abrir la página
+        renderizarTabla(catalogoJuegos);
+    </script>
+    <!-- Fin de los scripts -->
+
+</body>
+</html>
